@@ -1342,6 +1342,21 @@
   <p class="footer-copy">&copy; 2026 Klaim. Claim your city.</p>
 </footer>
 
+<!-- ════════════════════ FIREBASE ════════════════════ -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore.js';
+
+const app = initializeApp({
+  apiKey: "AIzaSyClKONFDsAP2dTL7kjlgX4ihb7p5fnKDx4",
+  projectId: "surfacerun",
+  storageBucket: "surfacerun.firebasestorage.app",
+  appId: "1:164959481917:ios:bf315df347bb64fac37a54"
+});
+
+window.__db = getFirestore(app);
+</script>
+
 <!-- ════════════════════ SCRIPTS ════════════════════ -->
 <script>
 // ─── Scroll Reveal ─────────────────────────────
@@ -1412,17 +1427,18 @@ form.addEventListener('submit', async (e) => {
   btn.textContent = 'Transmitting...';
   btn.disabled = true;
 
-  // TODO: Replace with your actual signup endpoint
-  // Example: POST to a Netlify Function, Firebase Function, or email service API
-  // For now, simulate success after a short delay
   try {
-    // await fetch('/api/signup', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ email })
-    // });
+    const db = window.__db;
+    const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore.js');
 
-    await new Promise(resolve => setTimeout(resolve, 1200));
+    // Use email as document ID (prevents duplicates, no read needed)
+    const docRef = doc(db, 'waitlist', email);
+    await setDoc(docRef, {
+      email: email,
+      source: 'landing_page',
+      created_at: new Date().toISOString(),
+      user_agent: navigator.userAgent
+    }, { merge: true });
 
     btn.textContent = 'Spot Reserved';
     btn.classList.add('success');
@@ -1431,6 +1447,7 @@ form.addEventListener('submit', async (e) => {
 
     statusLine.innerHTML = 'TERRITORY RESERVED // You will be notified at launch.<span class="cursor"></span>';
   } catch (err) {
+    console.error('Signup error:', err);
     btn.textContent = 'Reserve My Spot';
     btn.disabled = false;
     statusLine.innerHTML = 'TRANSMISSION ERROR // Retry.<span class="cursor"></span>';
