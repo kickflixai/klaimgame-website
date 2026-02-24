@@ -1095,6 +1095,159 @@
   }
 
   /* ═══════════════════════════════════════════
+     REFERRAL CARD — post-signup
+     ═══════════════════════════════════════════ */
+  .referral-card { display: none; }
+  .referral-card.active { display: block; }
+
+  .referral-position {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 8vw, 4rem);
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+  }
+
+  .referral-position-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .referral-tiers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+
+  .referral-tier {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    background: var(--bg);
+    border: 1px solid var(--surface-light);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+  }
+
+  .referral-tier.unlocked {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .tier-count {
+    min-width: 24px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.8rem;
+  }
+
+  .tier-reward {
+    flex: 1;
+    letter-spacing: 0.05em;
+  }
+
+  .tier-check {
+    font-size: 0.8rem;
+  }
+
+  .referral-link-box {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1rem;
+  }
+
+  .referral-link-input {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.75rem 0.75rem;
+    background: var(--bg);
+    border: 1px solid var(--surface-light);
+    border-right: none;
+    color: var(--accent);
+    outline: none;
+    letter-spacing: 0.02em;
+    cursor: text;
+    -webkit-user-select: all;
+    user-select: all;
+  }
+
+  .copy-btn {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.75rem 1rem;
+    background: var(--accent);
+    color: var(--bg);
+    border: 1px solid var(--accent);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+
+  .copy-btn:hover {
+    background: #f0b020;
+  }
+
+  .copy-btn.copied {
+    background: var(--green);
+    border-color: var(--green);
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.6rem 1rem;
+    background: var(--surface-light);
+    color: var(--text);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .share-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .referral-score {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+  }
+
+  .referral-score strong {
+    color: var(--accent);
+    font-size: 1.1rem;
+  }
+
+  /* ═══════════════════════════════════════════
      FOOTER
      ═══════════════════════════════════════════ */
   .footer {
@@ -1544,21 +1697,60 @@
     <h2 class="terminal-title">CLAIM BEFORE LAUNCH</h2>
     <p class="terminal-desc">Every player shares the same map. Hex claims are permanent and blocked for everyone else. The best locations in your city will go to the first players. Get on the TestFlight list before the map fills up.</p>
 
-    <form class="signup-form" id="signupForm">
-      <input
-        type="email"
-        class="signup-input"
-        placeholder="vault_id@surface.link"
-        required
-        autocomplete="email"
-        id="emailInput"
-      >
-      <button type="submit" class="signup-btn" id="signupBtn">
-        Reserve My Spot
-      </button>
-    </form>
+    <div id="signupFormWrap">
+      <form class="signup-form" id="signupForm">
+        <input
+          type="email"
+          class="signup-input"
+          placeholder="vault_id@surface.link"
+          required
+          autocomplete="email"
+          id="emailInput"
+        >
+        <button type="submit" class="signup-btn" id="signupBtn">
+          Reserve My Spot
+        </button>
+      </form>
 
-    <p class="signup-note">No spam. One alert when territory opens. Unsubscribe anytime.</p>
+      <p class="signup-note">No spam. One alert when territory opens. Unsubscribe anytime.</p>
+    </div>
+
+    <div class="referral-card" id="referralCard">
+      <div class="referral-position" id="positionNumber">YOU'RE #—</div>
+      <div class="referral-position-label">in the territory queue</div>
+
+      <div class="referral-tiers">
+        <div class="referral-tier" id="tier1">
+          <span class="tier-count">3</span>
+          <span class="tier-reward">refs = Early Beta Access</span>
+          <span class="tier-check" id="tier1Check"></span>
+        </div>
+        <div class="referral-tier" id="tier2">
+          <span class="tier-count">10</span>
+          <span class="tier-reward">refs = Founder's Krawler</span>
+          <span class="tier-check" id="tier2Check"></span>
+        </div>
+        <div class="referral-tier" id="tier3">
+          <span class="tier-count">25</span>
+          <span class="tier-reward">refs = Gold Territory Badge</span>
+          <span class="tier-check" id="tier3Check"></span>
+        </div>
+      </div>
+
+      <div class="referral-link-box">
+        <input type="text" class="referral-link-input" id="referralLinkInput" readonly>
+        <button class="copy-btn" id="copyBtn">Copy</button>
+      </div>
+
+      <div class="share-buttons">
+        <a class="share-btn" id="shareTwitter" href="#" target="_blank" rel="noopener">Twitter</a>
+        <a class="share-btn" id="shareWhatsApp" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+
+      <div class="referral-score">
+        Referrals: <strong id="referralCountDisplay">0</strong>
+      </div>
+    </div>
 
     <div class="status-line" id="statusLine">
       <span class="cursor"></span>
@@ -1581,7 +1773,7 @@
 <!-- ════════════════════ FIREBASE ════════════════════ -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js';
-import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/11.3.0/firebase-functions.js';
 
 const app = initializeApp({
   apiKey: "AIzaSyClKONFDsAP2dTL7kjlgX4ihb7p5fnKDx4",
@@ -1590,7 +1782,11 @@ const app = initializeApp({
   appId: "1:164959481917:ios:bf315df347bb64fac37a54"
 });
 
-window.__db = getFirestore(app);
+const functions = getFunctions(app);
+window.__joinWaitlist = httpsCallable(functions, 'joinWaitlist');
+
+// Capture ?ref= param from URL
+window.__refCode = new URLSearchParams(window.location.search).get('ref') || '';
 </script>
 
 <!-- ════════════════════ SCRIPTS ════════════════════ -->
@@ -1652,6 +1848,51 @@ const terminalObserver = new IntersectionObserver((entries) => {
 
 terminalObserver.observe(document.querySelector('.terminal-frame'));
 
+// ─── Referral Card Logic ──────────────────────
+function showReferralCard(position, referralCode, referralCount) {
+  document.getElementById('signupFormWrap').style.display = 'none';
+  const card = document.getElementById('referralCard');
+  card.classList.add('active');
+
+  document.getElementById('positionNumber').textContent = "YOU'RE #" + position;
+  document.getElementById('referralCountDisplay').textContent = referralCount;
+
+  const refLink = 'https://klaimgame.com?ref=' + referralCode;
+  document.getElementById('referralLinkInput').value = refLink;
+
+  // Update tier checkmarks
+  const tiers = [
+    { el: 'tier1', check: 'tier1Check', threshold: 3 },
+    { el: 'tier2', check: 'tier2Check', threshold: 10 },
+    { el: 'tier3', check: 'tier3Check', threshold: 25 }
+  ];
+  tiers.forEach(t => {
+    if (referralCount >= t.threshold) {
+      document.getElementById(t.el).classList.add('unlocked');
+      document.getElementById(t.check).textContent = '\u2713';
+    }
+  });
+
+  // Share links
+  const shareText = "I just reserved my territory in KLAIM — a real-world post-apocalyptic RPG. Claim your spot before the map fills up:";
+  document.getElementById('shareTwitter').href =
+    'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText + '\n' + refLink);
+  document.getElementById('shareWhatsApp').href =
+    'https://wa.me/?text=' + encodeURIComponent(shareText + ' ' + refLink);
+
+  // Copy button
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    navigator.clipboard.writeText(refLink).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+
+  statusLine.innerHTML = 'TERRITORY RESERVED // Share your link to move up.<span class="cursor"></span>';
+}
+
 // ─── Signup Form ───────────────────────────────
 const form = document.getElementById('signupForm');
 const btn = document.getElementById('signupBtn');
@@ -1666,24 +1907,15 @@ form.addEventListener('submit', async (e) => {
   btn.disabled = true;
 
   try {
-    const db = window.__db;
-    const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore.js');
-
-    // Use email as document ID (prevents duplicates, no read needed)
-    const docRef = doc(db, 'waitlist', email);
-    await setDoc(docRef, {
+    const result = await window.__joinWaitlist({
       email: email,
+      referredBy: window.__refCode || null,
       source: 'landing_page',
-      created_at: new Date().toISOString(),
-      user_agent: navigator.userAgent
-    }, { merge: true });
+      userAgent: navigator.userAgent
+    });
 
-    btn.textContent = 'Spot Reserved';
-    btn.classList.add('success');
-    emailInput.value = '';
-    emailInput.disabled = true;
-
-    statusLine.innerHTML = 'TERRITORY RESERVED // You will be notified at launch.<span class="cursor"></span>';
+    const d = result.data;
+    showReferralCard(d.position, d.referralCode, d.referralCount);
   } catch (err) {
     console.error('Signup error:', err);
     btn.textContent = 'Reserve My Spot';
